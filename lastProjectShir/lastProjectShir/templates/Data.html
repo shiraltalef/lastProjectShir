@@ -1,0 +1,62 @@
+﻿{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>{{ title }}.</h1>
+<h3>{{ message }}</h3>
+
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div>
+            <p> I chose this dataset becuase i was intrested and i wanted to explore this subject </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3" style="background-color: wheat">
+            <img src="https://media.mnn.com/assets/images/2016/05/happy-people-drinking-alcohol.jpg.653x0_q80_crop-smart.jpg" />
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-4" style="background-color: lightcyan">
+            <p> <font size="4"> First data: </font></p>
+        </div>
+        <div class="col-lg-4" style="background-color: lightblue">
+            <p> <font size="2"> Alcohol consumption by sex </font> </p>
+        </div>
+        <div class="col-lg-4" style="background-color: turquoise">
+            <p><a href="{{ url_for('DataSet') }}">Go To DataSet Page</a></p>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-4" style="background-color: lightcyan">
+            <p> <font size="4"> Second data: </font></p>
+        </div>
+        <div class="col-lg-4" style="background-color: lightblue">
+            <p> <font size="2">   Share of adults who drink alcohol</font> </p>
+        </div>
+        <div class="col-lg-4" style="background-color: turquoise">
+            <p><a href="{{ url_for('DataSet2') }}">Go To DataSet Page</a></p>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-lg-4" style="background-color: lightcyan">
+            <p> <font size="4"> Third data: </font></p>
+        </div>
+        <div class="col-lg-4" style="background-color: lightblue">
+            <p> <font size="2"> Share of adults who don’t drink alcohol </font> </p>
+        </div>
+        <div class="col-lg-4" style="background-color: turquoise">
+            <p><a href="{{ url_for('DataSet3') }}">Go To DataSet Page</a></p>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+© 2020 GitHub, Inc.
