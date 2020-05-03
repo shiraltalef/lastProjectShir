@@ -32,10 +32,18 @@ from wtforms import Form, BooleanField, StringField, PasswordField, validators
 from wtforms import TextField, TextAreaField, SubmitField, SelectField, DateField
 from wtforms import ValidationError
 
+import base64
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 from lastProjectShir.Models.QueryFormStructure import QueryFormStructure 
 from lastProjectShir.Models.QueryFormStructure import LoginFormStructure 
 from lastProjectShir.Models.QueryFormStructure import UserRegistrationFormStructure 
+from lastProjectShir.Models.QueryFormStructure import AlcoholFrom 
+
+from flask_bootstrap import Bootstrap
+bootstrap = Bootstrap(app)
+
 
 ###from DemoFormProject.Models.LocalDatabaseRoutines import IsUserExist, IsLoginGood, AddNewUser 
 
@@ -74,39 +82,44 @@ def about():
 
 
 
-@app.route('/Query', methods=['GET', 'POST'])
-def Query():
+@app.route('/query' , methods = ['GET' , 'POST'])
+def query():
 
-    Name = None
-    Country = ''
-    capital = ''
-    #df = pd.read_csv(path.join(path.dirname(__file__), 'static\\Data\\capitals.csv'))
-    #df = df.set_index('Country')
+    print("query")
 
-    form = QueryFormStructure(request.form)
+    form1 = AlcoholFrom()
+    chart = "https://cdn.psychologytoday.com/sites/default/files/styles/article-inline-half/public/field_blog_entry_images/shutterstock_289559648.jpg?itok=PytdvWHB" 
+
+   
+    df = pd.read_csv(path.join(path.dirname(__file__), 'static/data/males-vs-females-who-drank-alcohol-in-last-year.csv'))
+    
+    df = df.rename(columns={"Share of females who have drank alcohol in last year (%)":"Females", "Share of males who have drank alcohol in last year (%)":"Males", "Entity":"Country"})
+    df=df.set_index("Country")
+    df=df[df["Females"].notna()]
+    df=df[df["Males"].notna()]
+    l=df.index.tolist()
+    form1.countries.choices=list(zip(l,l))
+    df=df[['Males','Females']]
+
+    
+       
+    if request.method == 'POST':
+        countries= form1.countries.data
+        df=df.loc[countries]
+
      
-    if (request.method == 'POST' ):
-        name = form.name.data
-        Country = name
-        if (name in df.index):
-            capital = df.loc[name,'Capital']
-        else:
-            capital = name + ', no such country'
-        form.name.data = ''
+        fig = plt.figure()
+        fig.subplots_adjust(bottom=0.4)
+        ax = fig.add_subplot(111)
+        df.plot(ax = ax , kind = 'bar', figsize = (24, 8) , fontsize = 22 , grid = True)
+        chart = plot_to_img(fig)
 
-    df = pd.read_csv(path.join(path.dirname(__file__), 'static\\Data\\users.csv'))
-
-    raw_data_table = df.to_html(classes = 'table table-hover')
-
-    return render_template('Query.html', 
-            form = form, 
-            name = capital, 
-            Country = Country,
-            raw_data_table = raw_data_table,
-            title='Query by the user',
-            year=datetime.now().year,
-            message='This page will use the web forms to get user input'
-        )
+    
+    return render_template(
+        'query.html',
+        form1 = form1,
+        chart = chart
+    )
 
 # -------------------------------------------------------
 # Register new user page
@@ -212,3 +225,10 @@ def DataSet3():
         year=datetime.now().year,
         message='Global trends on alcohol abstinence show a mirror image of drinking prevalence data. This is shown in the charts as the share of adults who have never drunk alcohol.'
     )
+
+def plot_to_img(fig):
+    pngImage = io.BytesIO()
+    FigureCanvas(fig).print_png(pngImage)
+    pngImageB64String = "data:image/png;base64,"
+    pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
+    return pngImageB64String

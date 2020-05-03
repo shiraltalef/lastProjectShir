@@ -6,7 +6,7 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-from wtforms import Form, BooleanField, PasswordField
+from wtforms import Form, BooleanField, PasswordField, SelectMultipleField
 from wtforms import TextField, TextAreaField, SelectField, DateField
 from wtforms import validators, ValidationError
 
@@ -77,3 +77,6 @@ class UserRegistrationFormStructure(FlaskForm):
 #    submit = SubmitField('Submit')
 
 
+class AlcoholFrom(FlaskForm):
+    countries = SelectMultipleField('Select Countries:' , validators = [DataRequired])
+    submit = SubmitField('submit')
