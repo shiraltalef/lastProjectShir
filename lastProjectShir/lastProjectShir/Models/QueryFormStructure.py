@@ -78,5 +78,5 @@ class UserRegistrationFormStructure(FlaskForm):
 
 
 class AlcoholFrom(FlaskForm):
-    countries = SelectMultipleField('Select Countries:' , validators = [DataRequired])
+    countries = SelectMultipleField('Select Countries:' , validators = [DataRequired()])
     submit = SubmitField('submit')
