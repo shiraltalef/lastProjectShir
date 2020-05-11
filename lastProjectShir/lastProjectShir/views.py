@@ -90,19 +90,22 @@ def query():
     form1 = AlcoholFrom()
     chart = "https://cdn.psychologytoday.com/sites/default/files/styles/article-inline-half/public/field_blog_entry_images/shutterstock_289559648.jpg?itok=PytdvWHB" 
 
-   
+   # reading the csv file
     df = pd.read_csv(path.join(path.dirname(__file__), 'static/data/males-vs-females-who-drank-alcohol-in-last-year.csv'))
-    
+    #chancing the name of the columns to make life simpler
     df = df.rename(columns={"Share of females who have drank alcohol in last year (%)":"Females", "Share of males who have drank alcohol in last year (%)":"Males", "Entity":"Country"})
+    #sating index to country
     df=df.set_index("Country")
+    #removing nans
     df=df[df["Females"].notna()]
     df=df[df["Males"].notna()]
+    #prepring choices for form
     l=df.index.tolist()
     form1.countries.choices=list(zip(l,l))
     df=df[['Males','Females']]
 
     
-       
+       #this is where submit happens
     if request.method == 'POST':
         countries= form1.countries.data
         df=df.loc[countries]
@@ -158,7 +161,7 @@ def Login():
     if (request.method == 'POST' and form.validate()):
         if (db_Functions.IsLoginGood(form.username.data, form.password.data)):
             flash('Login approved!')
-            #return redirect('<were to go if login is good!')
+            return redirect('/query')
         else:
             flash('Error in - Username and/or password')
    
