@@ -45,7 +45,6 @@ from flask_bootstrap import Bootstrap
 bootstrap = Bootstrap(app)
 
 
-###from DemoFormProject.Models.LocalDatabaseRoutines import IsUserExist, IsLoginGood, AddNewUser 
 
 db_Functions = create_LocalDatabaseServiceRoutines() 
 
@@ -72,7 +71,7 @@ def contact():
 
 @app.route('/about')
 def about():
-    """Renders the home page."""
+    """Renders the about page."""
     return render_template(
         'about.html',
         title='My Project',
@@ -96,12 +95,13 @@ def query():
     df = df.rename(columns={"Share of females who have drank alcohol in last year (%)":"Females", "Share of males who have drank alcohol in last year (%)":"Males", "Entity":"Country"})
     #sating index to country
     df=df.set_index("Country")
-    #removing nans
+    #removing nans 
     df=df[df["Females"].notna()]
     df=df[df["Males"].notna()]
     #prepring choices for form
     l=df.index.tolist()
     form1.countries.choices=list(zip(l,l))
+    # מגדיר טבלה חדשה בה נמצאות רק העמודותmales ו- females
     df=df[['Males','Females']]
 
     
@@ -110,10 +110,11 @@ def query():
         countries= form1.countries.data
         df=df.loc[countries]
 
-     
+     #turn the graph into a picture
         fig = plt.figure()
         fig.subplots_adjust(bottom=0.4)
         ax = fig.add_subplot(111)
+        # desing the graph
         df.plot(ax = ax , kind = 'bar', figsize = (24, 8) , fontsize = 22 , grid = True)
         chart = plot_to_img(fig)
 
@@ -130,17 +131,18 @@ def query():
 @app.route('/register', methods=['GET', 'POST'])
 def Register():
     form = UserRegistrationFormStructure(request.form)
-
+    # מייבא מעמוד ה QueryFormStructure
     if (request.method == 'POST' and form.validate()):
         if (not db_Functions.IsUserExist(form.username.data)):
             db_Functions.AddNewUser(form)
             db_table = ""
 
             flash('Thanks for registering new user - '+ form.FirstName.data + " " + form.LastName.data )
-            # Here you should put what to do (or were to go) if registration was good
-        else:
-            flash('Error: User with this Username already exist ! - '+ form.username.data)
-            form = UserRegistrationFormStructure(request.form)
+             # אם כל הפרטים מתמלאים כראוי אז האתר יציג הודעה תודה שנרשמת 
+        else:  
+           flash('Error: User with this Username already exist ! - '+ form.username.data)
+           # אם השם שהזין המשתמש כבר קיים במערכת אז האתר יראה הודעת שגיאה
+           form = UserRegistrationFormStructure(request.form)
 
     return render_template(
         'register.html', 
@@ -164,7 +166,8 @@ def Login():
             return redirect('/query')
         else:
             flash('Error in - Username and/or password')
-   
+    ## אם שם המשתמש והסיסמה שהכניס המשתמש תואמים ונכונים, האתר יאשר זאת ויעביר אותו ישירות לעמוד ה-query
+   ## אם לא, האתר יחזיר הודעת שגיאה בה כתוב שם משתמש/ סיסמה אינם נכונים
     return render_template(
         'login.html', 
         form=form, 
@@ -175,7 +178,7 @@ def Login():
 
 @app.route('/Data')
 def Data():
-    """Renders the contact page."""
+    """Renders the data page."""
     return render_template(
         'Data.html',
         title='This is My data Page',
@@ -183,14 +186,16 @@ def Data():
         message='My data is about Alcohol consumption by sex'
     )
 
-
+# -------------------------------------------------
+# database page
+# --------------------------------------------------
 @app.route('/DataSet')
 def DataSet():
 
     df = pd.read_csv(path.join(path.dirname(__file__), 'static\\Data\\males-vs-females-who-drank-alcohol-in-last-year.csv'))
     raw_data_table = df.to_html(classes = 'table table-hover')
 
-    """Renders the contact page."""
+    """Renders the dataset page."""
     return render_template(
         'DataSet.html',
         title='This Data is about Alcohol consumption by sex',
@@ -199,13 +204,19 @@ def DataSet():
         message='When we look at gender differences we see that in all countries men are more likely to drink than women.'
     )
 
+# -------------------------------------------------
+# 2nd database page
+# -------------------------------------------------------
+
 @app.route('/DataSet2')
 def DataSet2():
-
+    # קורא את הקובץ
     df = pd.read_csv(path.join(path.dirname(__file__), 'static\\Data\\share-of-adults-who-drank-alcohol-in-last-year.csv'))
+    #הפקודה הורידה מקובץ ה Data את העמודות הלא רלוונטיות 
+    df=df[['Entity','Year','Indicator:Alcohol, consumers past 12 months (%) - Sex:Both sexes (%)']]
     raw_data_table2 = df.to_html(classes = 'table table-hover')
 
-    """Renders the contact page."""
+    """Renders the 2nd dataaset page."""
     return render_template(
         'DataSet2.html',
         title='Share of adults who drink alcohol',
@@ -214,10 +225,15 @@ def DataSet2():
         message='The share of adults who drink alcohol is highest across Western Europe and Australia. It is highest in France: In 2010, close to 95 percent of adults in France had drunk alcohol in the preceding year.'
     )
 
+# -------------------------------------------------
+# 3rd database page
+# --------------------------------------------------
 @app.route('/DataSet3')
 def DataSet3():
-
+    # קורא את הקובץ
     df = pd.read_csv(path.join(path.dirname(__file__), 'static\\Data\\share-who-have-not-drank-alcohol-in-last-year.csv'))
+    # הפקודה הורידה מקובץ ה Data את העמודות הלא רלוונטיות 
+    df=df[['Entity','Year','Indicator:Alcohol, abstainers past 12 months (%) - Sex:Both sexes (%)']]
     raw_data_table3 = df.to_html(classes = 'table table-hover')
 
     """Renders the contact page."""
@@ -229,6 +245,7 @@ def DataSet3():
         message='Global trends on alcohol abstinence show a mirror image of drinking prevalence data. This is shown in the charts as the share of adults who have never drunk alcohol.'
     )
 
+# הופך את הגרף לתמונה
 def plot_to_img(fig):
     pngImage = io.BytesIO()
     FigureCanvas(fig).print_png(pngImage)
