@@ -76,7 +76,7 @@ class UserRegistrationFormStructure(FlaskForm):
 #    
 #    submit = SubmitField('Submit')
 
-
+# this is my Query form it has one select moltiple field for selecting a list of countries. It has also submit button.
 class AlcoholFrom(FlaskForm):
     countries = SelectMultipleField('Select Countries:' , validators = [DataRequired()])
     submit = SubmitField('submit')

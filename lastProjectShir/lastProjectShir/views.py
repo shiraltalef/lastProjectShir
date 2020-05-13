@@ -89,7 +89,7 @@ def query():
     form1 = AlcoholFrom()
     chart = "https://cdn.psychologytoday.com/sites/default/files/styles/article-inline-half/public/field_blog_entry_images/shutterstock_289559648.jpg?itok=PytdvWHB" 
 
-   # reading the csv file
+   # reading the csv file 
     df = pd.read_csv(path.join(path.dirname(__file__), 'static/data/males-vs-females-who-drank-alcohol-in-last-year.csv'))
     #chancing the name of the columns to make life simpler
     df = df.rename(columns={"Share of females who have drank alcohol in last year (%)":"Females", "Share of males who have drank alcohol in last year (%)":"Males", "Entity":"Country"})
